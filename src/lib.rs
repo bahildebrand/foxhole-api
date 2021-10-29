@@ -1,19 +1,23 @@
 pub mod response_types;
 
+use std::error::Error;
+
 use response_types::WarDataResponse;
 
-const WAR_DATA: &'static str = "/worldconquest/war";
+const WAR_DATA: &str = "/worldconquest/war";
 
 pub struct Client {
     web_client: reqwest::Client,
 }
 
 impl Client {
-    pub async fn war_data(&self) -> WarDataResponse {
+    pub async fn war_data(&self) -> Result<WarDataResponse, Box<dyn Error>> {
         let request_string = build_request(WAR_DATA);
 
-        let response = self.web_client.get(request_string).send().await.unwrap();
-        response.json::<WarDataResponse>().await.unwrap()
+        let response = self.web_client.get(request_string).send().await?;
+        let response = response.json::<WarDataResponse>().await?;
+
+        Ok(response)
     }
 }
 
@@ -71,7 +75,7 @@ mod test {
 
         let client = Client::default();
 
-        let response = client.war_data().await;
+        let response = client.war_data().await.unwrap();
         assert_eq!(expected_response, response);
     }
 }
