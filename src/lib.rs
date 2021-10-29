@@ -83,7 +83,7 @@ fn build_request(endpoint: String) -> String {
 
 #[cfg(test)]
 mod test {
-    use crate::response_types::{MapItem, MapTextItem};
+    use crate::response_types::{IconType, MapItem, MapTextItem};
 
     use super::*;
     use mockito::mock;
@@ -235,14 +235,14 @@ mod test {
         let map_items = vec![
             MapItem {
                 team_id: "NONE".to_string(),
-                icon_type: 20,
+                icon_type: IconType::SalvageField,
                 x: 0.43503433,
                 y: 0.83201146,
                 flags: 0,
             },
             MapItem {
                 team_id: "NONE".to_string(),
-                icon_type: 20,
+                icon_type: IconType::SalvageField,
                 x: 0.83840775,
                 y: 0.45411408,
                 flags: 0,
