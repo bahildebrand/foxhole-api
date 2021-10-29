@@ -2,10 +2,12 @@ pub mod response_types;
 
 use std::error::Error;
 
-use response_types::{MapDataResponse, WarDataResponse};
+use response_types::{MapNameResponse, WarDataResponse};
 use serde::de::DeserializeOwned;
 
-const MAP_DATA: &str = "/worldconquest/maps";
+use crate::response_types::MapDataResponse;
+
+const MAP_NAME: &str = "/worldconquest/maps";
 const WAR_DATA: &str = "/worldconquest/war";
 
 pub struct Client {
@@ -19,9 +21,20 @@ impl Client {
         Ok(war_data)
     }
 
-    pub async fn map_data(&self) -> Result<MapDataResponse, Box<dyn Error>> {
-        let maps: Vec<String> = self.get_response(MAP_DATA.to_string()).await?;
-        let map_data = MapDataResponse { maps };
+    pub async fn map_names(&self) -> Result<MapNameResponse, Box<dyn Error>> {
+        let maps: Vec<String> = self.get_response(MAP_NAME.to_string()).await?;
+        let map_data = MapNameResponse { maps };
+
+        Ok(map_data)
+    }
+
+    pub async fn map_data_static(
+        &self,
+        map_name: String,
+    ) -> Result<MapDataResponse, Box<dyn Error>> {
+        // FIXME: Write a macro for this to avoid copy past
+        let endpoint_string = format!("/worldconquest/maps/{}/static", map_name);
+        let map_data: MapDataResponse = self.get_response(endpoint_string).await?;
 
         Ok(map_data)
     }
@@ -59,6 +72,8 @@ fn build_request(endpoint: String) -> String {
 
 #[cfg(test)]
 mod test {
+    use crate::response_types::MapTextItem;
+
     use super::*;
     use mockito::mock;
 
@@ -96,17 +111,17 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_map_data() {
-        let map_data_string = r#"[
+    async fn test_map_name() {
+        let map_name_string = r#"[
             "TheFingersHex",
             "GreatMarchHex",
             "TempestIslandHex"
           ]"#;
 
-        let _m = mock("GET", MAP_DATA)
+        let _m = mock("GET", MAP_NAME)
             .with_status(200)
             .with_header("content-type", "application/json")
-            .with_body(map_data_string)
+            .with_body(map_name_string)
             .create();
 
         let maps = vec![
@@ -114,10 +129,72 @@ mod test {
             "GreatMarchHex".to_string(),
             "TempestIslandHex".to_string(),
         ];
-        let expected_response = MapDataResponse { maps };
+        let expected_response = MapNameResponse { maps };
 
         let client = Client::default();
-        let response = client.map_data().await.unwrap();
+        let response = client.map_names().await.unwrap();
+        assert_eq!(expected_response, response);
+    }
+
+    #[tokio::test]
+    async fn test_map_data_static() {
+        let map_data_string = r#"{
+            "regionId": 38,
+            "scorchedVictoryTowns": 0,
+            "mapItems": [],
+            "mapTextItems": [
+              {
+                "text": "Captain's Dread",
+                "x": 0.8643478,
+                "y": 0.4387644,
+                "mapMarkerType": "Minor"
+              },
+              {
+                "text": "Cavitatis",
+                "x": 0.43523252,
+                "y": 0.6119927,
+                "mapMarkerType": "Minor"
+              }
+            ],
+            "lastUpdated": 1635388391413,
+            "version": 3
+          }"#;
+
+        let map_text_items = vec![
+            MapTextItem {
+                text: "Captain's Dread".to_string(),
+                x: 0.8643478,
+                y: 0.4387644,
+                map_marker_type: "Minor".to_string(),
+            },
+            MapTextItem {
+                text: "Cavitatis".to_string(),
+                x: 0.43523252,
+                y: 0.6119927,
+                map_marker_type: "Minor".to_string(),
+            },
+        ];
+
+        let expected_response = MapDataResponse {
+            region_id: 38,
+            scorched_victory_towns: 0,
+            map_items: Vec::new(),
+            map_text_items,
+            last_updated: 1635388391413,
+            version: 3,
+        };
+
+        // FIXME: Write a macro for this to avoid copy pasta
+        let map_string = "TheFingersHex".to_string();
+        let endpoint_string = format!("/worldconquest/maps/{}/static", map_string.clone());
+        let _m = mock("GET", endpoint_string.as_str())
+            .with_status(200)
+            .with_header("content-type", "application/json")
+            .with_body(map_data_string)
+            .create();
+
+        let client = Client::default();
+        let response = client.map_data_static(map_string).await.unwrap();
         assert_eq!(expected_response, response);
     }
 }
