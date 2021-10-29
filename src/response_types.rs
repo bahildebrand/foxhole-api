@@ -12,3 +12,8 @@ pub struct WarDataResponse {
     pub resistance_start_time: Option<u64>,
     pub required_victory_towns: u8,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MapDataResponse {
+    pub maps: Vec<String>,
+}

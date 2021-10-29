@@ -2,8 +2,9 @@ pub mod response_types;
 
 use std::error::Error;
 
-use response_types::WarDataResponse;
+use response_types::{MapDataResponse, WarDataResponse};
 
+const MAP_DATA: &str = "/worldconquest/maps";
 const WAR_DATA: &str = "/worldconquest/war";
 
 pub struct Client {
@@ -18,6 +19,17 @@ impl Client {
         let response = response.json::<WarDataResponse>().await?;
 
         Ok(response)
+    }
+
+    pub async fn map_data(&self) -> Result<MapDataResponse, Box<dyn Error>> {
+        let request_string = build_request(MAP_DATA);
+
+        let response = self.web_client.get(request_string.clone()).send().await?;
+
+        let response = response.json::<Vec<String>>().await?;
+        let map_data = MapDataResponse { maps: response };
+
+        Ok(map_data)
     }
 }
 
@@ -74,8 +86,33 @@ mod test {
             .create();
 
         let client = Client::default();
-
         let response = client.war_data().await.unwrap();
+        assert_eq!(expected_response, response);
+    }
+
+    #[tokio::test]
+    async fn test_map_data() {
+        let map_data_string = r#"[
+            "TheFingersHex",
+            "GreatMarchHex",
+            "TempestIslandHex"
+          ]"#;
+
+        let _m = mock("GET", MAP_DATA)
+            .with_status(200)
+            .with_header("content-type", "application/json")
+            .with_body(map_data_string)
+            .create();
+
+        let maps = vec![
+            "TheFingersHex".to_string(),
+            "GreatMarchHex".to_string(),
+            "TempestIslandHex".to_string(),
+        ];
+        let expected_response = MapDataResponse { maps };
+
+        let client = Client::default();
+        let response = client.map_data().await.unwrap();
         assert_eq!(expected_response, response);
     }
 }
