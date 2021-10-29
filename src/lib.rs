@@ -3,6 +3,7 @@ pub mod response_types;
 use std::error::Error;
 
 use response_types::{MapDataResponse, WarDataResponse};
+use serde::de::DeserializeOwned;
 
 const MAP_DATA: &str = "/worldconquest/maps";
 const WAR_DATA: &str = "/worldconquest/war";
@@ -13,23 +14,27 @@ pub struct Client {
 
 impl Client {
     pub async fn war_data(&self) -> Result<WarDataResponse, Box<dyn Error>> {
-        let request_string = build_request(WAR_DATA);
+        let war_data: WarDataResponse = self.get_response(WAR_DATA.to_string()).await?;
 
-        let response = self.web_client.get(request_string).send().await?;
-        let response = response.json::<WarDataResponse>().await?;
-
-        Ok(response)
+        Ok(war_data)
     }
 
     pub async fn map_data(&self) -> Result<MapDataResponse, Box<dyn Error>> {
-        let request_string = build_request(MAP_DATA);
-
-        let response = self.web_client.get(request_string.clone()).send().await?;
-
-        let response = response.json::<Vec<String>>().await?;
-        let map_data = MapDataResponse { maps: response };
+        let maps: Vec<String> = self.get_response(MAP_DATA.to_string()).await?;
+        let map_data = MapDataResponse { maps };
 
         Ok(map_data)
+    }
+
+    async fn get_response<T>(&self, endpoint: String) -> Result<T, Box<dyn Error>>
+    where
+        T: DeserializeOwned,
+    {
+        let request_string = build_request(endpoint);
+        let response = self.web_client.get(request_string.clone()).send().await?;
+        let response = response.json::<T>().await?;
+
+        Ok(response)
     }
 }
 
@@ -41,14 +46,14 @@ impl Default for Client {
     }
 }
 
-fn build_request(endpoint: &'static str) -> String {
+fn build_request(endpoint: String) -> String {
     #[cfg(not(test))]
     let mut request_string = "https://war-service-live.foxholeservices.com/api".to_string();
 
     #[cfg(test)]
     let mut request_string = mockito::server_url();
 
-    request_string.push_str(endpoint);
+    request_string.push_str(endpoint.as_str());
     request_string
 }
 
