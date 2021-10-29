@@ -39,6 +39,17 @@ impl Client {
         Ok(map_data)
     }
 
+    pub async fn map_data_dynamic(
+        &self,
+        map_name: String,
+    ) -> Result<MapDataResponse, Box<dyn Error>> {
+        // FIXME: Write a macro for this to avoid copy past
+        let endpoint_string = format!("/worldconquest/maps/{}/dynamic/public", map_name);
+        let map_data: MapDataResponse = self.get_response(endpoint_string).await?;
+
+        Ok(map_data)
+    }
+
     async fn get_response<T>(&self, endpoint: String) -> Result<T, Box<dyn Error>>
     where
         T: DeserializeOwned,
@@ -72,7 +83,7 @@ fn build_request(endpoint: String) -> String {
 
 #[cfg(test)]
 mod test {
-    use crate::response_types::MapTextItem;
+    use crate::response_types::{MapItem, MapTextItem};
 
     use super::*;
     use mockito::mock;
@@ -186,7 +197,7 @@ mod test {
 
         // FIXME: Write a macro for this to avoid copy pasta
         let map_string = "TheFingersHex".to_string();
-        let endpoint_string = format!("/worldconquest/maps/{}/static", map_string.clone());
+        let endpoint_string = format!("/worldconquest/maps/{}/static", map_string);
         let _m = mock("GET", endpoint_string.as_str())
             .with_status(200)
             .with_header("content-type", "application/json")
@@ -195,6 +206,70 @@ mod test {
 
         let client = Client::default();
         let response = client.map_data_static(map_string).await.unwrap();
+        assert_eq!(expected_response, response);
+    }
+
+    #[tokio::test]
+    async fn test_map_data_dynamic() {
+        let map_data_string = r#"{
+            "regionId" : 38,
+            "scorchedVictoryTowns" : 0,
+            "mapItems" : [ {
+              "teamId" : "NONE",
+              "iconType" : 20,
+              "x" : 0.43503433,
+              "y" : 0.83201146,
+              "flags" : 0
+            }, {
+              "teamId" : "NONE",
+              "iconType" : 20,
+              "x" : 0.83840775,
+              "y" : 0.45411408,
+              "flags" : 0
+            } ],
+            "mapTextItems" : [ ],
+            "lastUpdated" : 1635534670643,
+            "version" : 5
+          }"#;
+
+        let map_items = vec![
+            MapItem {
+                team_id: "NONE".to_string(),
+                icon_type: 20,
+                x: 0.43503433,
+                y: 0.83201146,
+                flags: 0,
+            },
+            MapItem {
+                team_id: "NONE".to_string(),
+                icon_type: 20,
+                x: 0.83840775,
+                y: 0.45411408,
+                flags: 0,
+            },
+        ];
+
+        let expected_response = MapDataResponse {
+            region_id: 38,
+            scorched_victory_towns: 0,
+            map_items,
+            map_text_items: Vec::new(),
+            last_updated: 1635534670643,
+            version: 5,
+        };
+
+        // FIXME: Write a macro for this to avoid copy pasta
+        let map_string = "TheFingersHex".to_string();
+        let endpoint_string = format!("/worldconquest/maps/{}/dynamic/public", map_string);
+
+        let _m = mock("GET", endpoint_string.as_str())
+            .with_status(200)
+            .with_header("content-type", "application/json")
+            .with_body(map_data_string)
+            .create();
+
+        let client = Client::default();
+        let response = client.map_data_dynamic(map_string).await.unwrap();
         assert_eq!(expected_response, response);
     }
 }
