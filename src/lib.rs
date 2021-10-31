@@ -1,26 +1,56 @@
+//! Foxhole War API.
+//!
+//! This crate is a wrapper around the [Foxhole War API](https://github.com/clapfoot/warapi). This
+//! crate requires the use of async code, as well as the [Tokio](https://docs.rs/tokio) runtime.
+//!
+//! Usage example:
+//!
+//! ```
+//! use foxhole_api::Client;
+//!
+//! #[tokio::main]
+//! async fn main() {
+//!     let client = Client::default();
+//!
+//!     let war_data = client.war_data().await.unwrap();
+//!     let map_names = client.map_names().await.unwrap();
+//!     let static_map_data = client.map_data_static("TheFingersHex".to_string()).await.unwrap();
+//!     let dynamic_map_data = client.map_data_dynamic("TheFingersHex".to_string()).await.unwrap();
+//! }
+//! ```
+
 pub mod response_types;
 
 use std::error::Error;
 
-use response_types::{MapNameResponse, WarDataResponse};
+use response_types::{MapDataResponse, MapNameResponse, WarDataResponse};
 use serde::de::DeserializeOwned;
-
-use crate::response_types::MapDataResponse;
 
 const MAP_NAME: &str = "/worldconquest/maps";
 const WAR_DATA: &str = "/worldconquest/war";
 
+/// Client for fetching data from the war API.
+///
+/// This client contains an HTTP client, and only one instance should be needed per process.
 pub struct Client {
     web_client: reqwest::Client,
 }
 
 impl Client {
+    /// Retrieves information about the current war.
+    ///
+    /// This endpoint retrieves information about the current war, and returns it deserialized as
+    /// [`WarDataResponse`].
     pub async fn war_data(&self) -> Result<WarDataResponse, Box<dyn Error>> {
         let war_data: WarDataResponse = self.get_response(WAR_DATA.to_string()).await?;
 
         Ok(war_data)
     }
 
+    /// Retrieves all map names.
+    ///
+    /// This endpoint retrieves all map names currently present, and returns them deserialized as
+    /// [`MapNameResponse`].
     pub async fn map_names(&self) -> Result<MapNameResponse, Box<dyn Error>> {
         let maps: Vec<String> = self.get_response(MAP_NAME.to_string()).await?;
         let map_data = MapNameResponse { maps };
@@ -28,22 +58,31 @@ impl Client {
         Ok(map_data)
     }
 
+    /// Retrieves all static map data.
+    ///
+    /// This endpoint retrieves all map data that will never change over the course of a war. This
+    /// includes map text labels and resource node locations.
     pub async fn map_data_static(
         &self,
         map_name: String,
     ) -> Result<MapDataResponse, Box<dyn Error>> {
-        // FIXME: Write a macro for this to avoid copy past
+        // FIXME: Write a macro for this to avoid copy pasta
         let endpoint_string = format!("/worldconquest/maps/{}/static", map_name);
         let map_data: MapDataResponse = self.get_response(endpoint_string).await?;
 
         Ok(map_data)
     }
 
+    /// Retrieves all dynamic map data.
+    ///
+    /// This endpoint retrieves all map daa that could change over the course of a war. This
+    /// includes relic bases, and town halls that could change team ownership. Private data, such as
+    /// player built fortifications, is not available.
     pub async fn map_data_dynamic(
         &self,
         map_name: String,
     ) -> Result<MapDataResponse, Box<dyn Error>> {
-        // FIXME: Write a macro for this to avoid copy past
+        // FIXME: Write a macro for this to avoid copy pasta
         let endpoint_string = format!("/worldconquest/maps/{}/dynamic/public", map_name);
         let map_data: MapDataResponse = self.get_response(endpoint_string).await?;
 
