@@ -3,7 +3,11 @@
 A rust wrapper for the [Foxhole War API](https://github.com/clapfoot/warapi).
 
 [![MIT licensed][mit-badge]][mit-url]
+[![Crates.io][crates-badge]][crates-url]
+[![Docs](https://docs.rs/foxhole-api/badge.svg)](https://docs.rs/foxhole-api)
 
+[crates-badge]: https://img.shields.io/crates/v/foxhole-api.svg
+[crates-url]: https://crates.io/crates/foxhole-api
 [mit-badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [mit-url]: https://github.com/tokio-rs/tokio/blob/master/LICENSE
 
