@@ -1,6 +1,6 @@
 # Foxhole API
 
-A rust wrapper for the [Foxhole War API](https://github.com/clapfoot/warapi).
+An unofficial rust wrapper for the [Foxhole War API](https://github.com/clapfoot/warapi).
 
 [![MIT licensed][mit-badge]][mit-url]
 [![Crates.io][crates-badge]][crates-url]
@@ -31,3 +31,5 @@ async fn main() {
     let dynamic_map_data = client.map_data_dynamic("TheFingersHex".to_string()).await.unwrap();
 }
 ```
+
+[Foxhole](https://www.foxholegame.com/) is a registered trademark of [Siege Camp](https://www.siegecamp.com/).
