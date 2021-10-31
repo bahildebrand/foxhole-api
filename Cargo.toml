@@ -3,8 +3,14 @@ name = "foxhole-api"
 version = "0.1.0"
 edition = "2021"
 readme = "README.md"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+repository = "https://github.com/bahildebrand/foxhole-api"
+homepage = "https://github.com/bahildebrand/foxhole-api"
+description = """
+A rust wrapper for the Foxhole War API.
+"""
+keywords = ["foxhole"]
+categories = ["api-bindings", "asynchronous"]
+license = "MIT"
 
 [dependencies]
 reqwest = { version = "0.11", features = ["json"] }
