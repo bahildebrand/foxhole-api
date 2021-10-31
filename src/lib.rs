@@ -86,7 +86,15 @@ mod test {
     use crate::response_types::{IconType, MapItem, MapTextItem};
 
     use super::*;
-    use mockito::mock;
+    use mockito::{mock, Mock};
+
+    fn build_mock(endpoint: &str, body: &'static str) -> Mock {
+        mock("GET", endpoint)
+            .with_status(200)
+            .with_header("content-type", "application/json")
+            .with_body(body)
+            .create()
+    }
 
     #[tokio::test]
     async fn test_war_data() {
@@ -110,11 +118,7 @@ mod test {
             required_victory_towns: 32,
         };
 
-        let _m = mock("GET", WAR_DATA)
-            .with_status(200)
-            .with_header("content-type", "application/json")
-            .with_body(war_data_string)
-            .create();
+        let _m = build_mock(WAR_DATA, war_data_string);
 
         let client = Client::default();
         let response = client.war_data().await.unwrap();
@@ -129,11 +133,7 @@ mod test {
             "TempestIslandHex"
           ]"#;
 
-        let _m = mock("GET", MAP_NAME)
-            .with_status(200)
-            .with_header("content-type", "application/json")
-            .with_body(map_name_string)
-            .create();
+        let _m = build_mock(MAP_NAME, map_name_string);
 
         let maps = vec![
             "TheFingersHex".to_string(),
@@ -198,11 +198,7 @@ mod test {
         // FIXME: Write a macro for this to avoid copy pasta
         let map_string = "TheFingersHex".to_string();
         let endpoint_string = format!("/worldconquest/maps/{}/static", map_string);
-        let _m = mock("GET", endpoint_string.as_str())
-            .with_status(200)
-            .with_header("content-type", "application/json")
-            .with_body(map_data_string)
-            .create();
+        let _m = build_mock(endpoint_string.as_str(), map_data_string);
 
         let client = Client::default();
         let response = client.map_data_static(map_string).await.unwrap();
@@ -261,12 +257,7 @@ mod test {
         // FIXME: Write a macro for this to avoid copy pasta
         let map_string = "TheFingersHex".to_string();
         let endpoint_string = format!("/worldconquest/maps/{}/dynamic/public", map_string);
-
-        let _m = mock("GET", endpoint_string.as_str())
-            .with_status(200)
-            .with_header("content-type", "application/json")
-            .with_body(map_data_string)
-            .create();
+        let _m = build_mock(endpoint_string.as_str(), map_data_string);
 
         let client = Client::default();
         let response = client.map_data_dynamic(map_string).await.unwrap();
