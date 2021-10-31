@@ -10,6 +10,7 @@
 //!
 //! #[tokio::main]
 //! async fn main() {
+//!     // The default shard is Live-1
 //!     let client = Client::default();
 //!
 //!     let war_data = client.war_data().await.unwrap();
@@ -29,14 +30,27 @@ use serde::de::DeserializeOwned;
 const MAP_NAME: &str = "/worldconquest/maps";
 const WAR_DATA: &str = "/worldconquest/war";
 
+/// Used to specify the shard of the api
+pub enum Shard {
+    Live1,
+    Live2,
+}
+
 /// Client for fetching data from the war API.
 ///
 /// This client contains an HTTP client, and only one instance should be needed per process.
 pub struct Client {
     web_client: reqwest::Client,
+    shard: Shard,
 }
 
 impl Client {
+    pub fn new(shard: Shard) -> Self {
+        let web_client = reqwest::Client::new();
+
+        Self { web_client, shard }
+    }
+
     /// Retrieves information about the current war.
     ///
     /// This endpoint retrieves information about the current war, and returns it deserialized as
@@ -93,31 +107,39 @@ impl Client {
     where
         T: DeserializeOwned,
     {
-        let request_string = build_request(endpoint);
+        let request_string = self.build_request(endpoint);
         let response = self.web_client.get(request_string.clone()).send().await?;
         let response = response.json::<T>().await?;
 
         Ok(response)
     }
+
+    fn build_request(&self, endpoint: String) -> String {
+        #[cfg(not(test))]
+        let mut request_string = self.get_shard_url();
+
+        #[cfg(test)]
+        let mut request_string = mockito::server_url();
+
+        request_string.push_str(endpoint.as_str());
+        request_string
+    }
+
+    #[cfg(not(test))]
+    fn get_shard_url(&self) -> String {
+        let shard = match self.shard {
+            Shard::Live1 => "live",
+            Shard::Live2 => "live-2",
+        };
+
+        format!("https://war-service-{}.foxholeservices.com/api", shard)
+    }
 }
 
 impl Default for Client {
     fn default() -> Self {
-        let web_client = reqwest::Client::new();
-
-        Self { web_client }
+        Client::new(Shard::Live1)
     }
-}
-
-fn build_request(endpoint: String) -> String {
-    #[cfg(not(test))]
-    let mut request_string = "https://war-service-live.foxholeservices.com/api".to_string();
-
-    #[cfg(test)]
-    let mut request_string = mockito::server_url();
-
-    request_string.push_str(endpoint.as_str());
-    request_string
 }
 
 #[cfg(test)]
