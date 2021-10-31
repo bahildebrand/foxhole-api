@@ -9,7 +9,7 @@ An unofficial rust wrapper for the [Foxhole War API](https://github.com/clapfoot
 [crates-badge]: https://img.shields.io/crates/v/foxhole-api.svg
 [crates-url]: https://crates.io/crates/foxhole-api
 [mit-badge]: https://img.shields.io/badge/license-MIT-blue.svg
-[mit-url]: https://github.com/tokio-rs/tokio/blob/master/LICENSE
+[mit-url]: https://github.com/bahildebrand/foxhole-api/blob/master/LICENSE
 
 ## Dependencies
 
