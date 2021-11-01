@@ -5,6 +5,7 @@ An unofficial rust wrapper for the [Foxhole War API](https://github.com/clapfoot
 [![MIT licensed][mit-badge]][mit-url]
 [![Crates.io][crates-badge]][crates-url]
 [![Docs](https://docs.rs/foxhole-api/badge.svg)](https://docs.rs/foxhole-api)
+![example workflow](https://github.com/bahildebrand/foxhole-api/actions/workflows/rust.yml/badge.svg)
 
 [crates-badge]: https://img.shields.io/crates/v/foxhole-api.svg
 [crates-url]: https://crates.io/crates/foxhole-api
