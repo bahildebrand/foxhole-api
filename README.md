@@ -5,12 +5,14 @@ An unofficial rust wrapper for the [Foxhole War API](https://github.com/clapfoot
 [![MIT licensed][mit-badge]][mit-url]
 [![Crates.io][crates-badge]][crates-url]
 [![Docs](https://docs.rs/foxhole-api/badge.svg)](https://docs.rs/foxhole-api)
-![example workflow](https://github.com/bahildebrand/foxhole-api/actions/workflows/rust.yml/badge.svg)
+[![Actions Workflow][actions-badge]][actions-url]
 
 [crates-badge]: https://img.shields.io/crates/v/foxhole-api.svg
 [crates-url]: https://crates.io/crates/foxhole-api
 [mit-badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [mit-url]: https://github.com/bahildebrand/foxhole-api/blob/master/LICENSE
+[actions-badge]: https://github.com/bahildebrand/foxhole-api/actions/workflows/rust.yml/badge.svg
+[actions-url]: https://github.com/bahildebrand/foxhole-api/actions
 
 ## Dependencies
 
