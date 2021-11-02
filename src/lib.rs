@@ -41,6 +41,7 @@ pub enum Shard {
 /// This client contains an HTTP client, and only one instance should be needed per process.
 pub struct Client {
     web_client: reqwest::Client,
+    #[allow(dead_code)]
     shard: Shard,
 }
 
