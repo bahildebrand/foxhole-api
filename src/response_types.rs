@@ -7,7 +7,7 @@ use serde_repr::Deserialize_repr;
 pub struct WarDataResponse {
     pub war_id: String,
     pub war_number: u32,
-    pub winner: String,
+    pub winner: TeamId,
     pub conquest_start_time: u64,
     pub conquest_end_time: Option<u64>,
     pub resistance_start_time: Option<u64>,
@@ -33,7 +33,7 @@ pub struct MapDataResponse {
 #[derive(Debug, Deserialize, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct MapItem {
-    pub team_id: String,
+    pub team_id: TeamId,
     pub icon_type: IconType,
     pub x: f32,
     pub y: f32,
@@ -98,4 +98,12 @@ pub enum IconType {
     TownBase1 = 56,
     TownBase2 = 57,
     TownBase3 = 58,
+}
+
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[serde(rename_all = "UPPERCASE")]
+pub enum TeamId {
+    None,
+    Wardens,
+    Colonials,
 }

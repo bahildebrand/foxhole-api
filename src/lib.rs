@@ -144,7 +144,7 @@ impl Default for Client {
 
 #[cfg(test)]
 mod test {
-    use crate::response_types::{IconType, MapItem, MapTextItem};
+    use crate::response_types::{IconType, MapItem, MapTextItem, TeamId};
 
     use super::*;
     use mockito::{mock, Mock};
@@ -172,7 +172,7 @@ mod test {
         let expected_response = WarDataResponse {
             war_id: "1e82269a-d82b-4350-b1b1-06a98c983503".to_string(),
             war_number: 83,
-            winner: "NONE".to_string(),
+            winner: TeamId::None,
             conquest_start_time: 1632326703205,
             conquest_end_time: None,
             resistance_start_time: None,
@@ -278,11 +278,17 @@ mod test {
               "y" : 0.83201146,
               "flags" : 0
             }, {
-              "teamId" : "NONE",
+              "teamId" : "COLONIALS",
               "iconType" : 20,
               "x" : 0.83840775,
               "y" : 0.45411408,
               "flags" : 0
+            }, {
+              "teamId" : "WARDENS",
+              "iconType" : 20,
+              "x" : 0.83840775,
+              "y" : 0.45411408,
+                "flags" : 0
             } ],
             "mapTextItems" : [ ],
             "lastUpdated" : 1635534670643,
@@ -291,14 +297,21 @@ mod test {
 
         let map_items = vec![
             MapItem {
-                team_id: "NONE".to_string(),
+                team_id: TeamId::None,
                 icon_type: IconType::SalvageField,
                 x: 0.43503433,
                 y: 0.83201146,
                 flags: 0,
             },
             MapItem {
-                team_id: "NONE".to_string(),
+                team_id: TeamId::Colonials,
+                icon_type: IconType::SalvageField,
+                x: 0.83840775,
+                y: 0.45411408,
+                flags: 0,
+            },
+            MapItem {
+                team_id: TeamId::Wardens,
                 icon_type: IconType::SalvageField,
                 x: 0.83840775,
                 y: 0.45411408,
