@@ -42,7 +42,7 @@ async fn main() {
 }
 ```
 
-### Contributing
+## Contributing
 
 PRs and feature request are always welcome!
 

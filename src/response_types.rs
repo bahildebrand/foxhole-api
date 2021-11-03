@@ -1,7 +1,15 @@
+//! Response types for all war api endpoints.
+//!
+//! For more detailed information on the contents of each response see the
+//! [Foxhole War API](https://github.com/clapfoot/warapi) definition.
+
 use serde;
 use serde::Deserialize;
 use serde_repr::Deserialize_repr;
 
+/// Response for the `worldconquest/war` endpoint.
+///
+/// This response contains information about the status of the war for a given shard.
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct WarDataResponse {
@@ -14,11 +22,18 @@ pub struct WarDataResponse {
     pub required_victory_towns: u8,
 }
 
+/// Response for the `worldconquest/maps` endpoint.
+///
+/// Contains a list of all maps present on the shard.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MapNameResponse {
     pub maps: Vec<String>,
 }
 
+/// Response for the /worldconquest/maps/{map}/dynamic|static endpoints.
+///
+/// Contains information about a requested map hex. This includes static objects, as well as objects
+/// that can change dynamically. This does not include player built fortifications.
 #[derive(Debug, Deserialize, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct MapDataResponse {
@@ -30,6 +45,9 @@ pub struct MapDataResponse {
     pub version: u16,
 }
 
+/// Contains information about a single item present on a map hex.
+///
+/// Includes the owner of the item, its position, as well as what type of item it is.
 #[derive(Debug, Deserialize, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct MapItem {
@@ -40,6 +58,9 @@ pub struct MapItem {
     pub flags: u16,
 }
 
+/// Contains information about a map label.
+///
+/// Includes the text, position, and type of a label.
 #[derive(Debug, Deserialize, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct MapTextItem {
@@ -49,6 +70,9 @@ pub struct MapTextItem {
     pub map_marker_type: String,
 }
 
+/// The type of icon for a map item.
+///
+/// This includes a mapping of the icon type to the underlying number used by the API.
 #[derive(Deserialize_repr, PartialEq, Debug, Clone)]
 #[repr(u16)]
 pub enum IconType {
@@ -100,6 +124,7 @@ pub enum IconType {
     TownBase3 = 58,
 }
 
+/// Team id for a map item.
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum TeamId {
