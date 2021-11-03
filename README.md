@@ -20,6 +20,13 @@ This library requires the use of [tokio](https://github.com/tokio-rs/tokio) as a
 
 ## Usage
 
+```toml
+[dependencies]
+foxhole-api = "0.2"
+```
+
+### Example
+
 ```rust
 use foxhole_api::Client;
 
@@ -34,5 +41,9 @@ async fn main() {
     let dynamic_map_data = client.map_data_dynamic("TheFingersHex".to_string()).await.unwrap();
 }
 ```
+
+### Contributing
+
+PRs and feature request are always welcome!
 
 [Foxhole](https://www.foxholegame.com/) is a registered trademark of [Siege Camp](https://www.siegecamp.com/).
