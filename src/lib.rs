@@ -145,7 +145,7 @@ impl Default for Client {
 
 #[cfg(test)]
 mod test {
-    use crate::response_types::{IconType, MapItem, MapTextItem, TeamId};
+    use crate::response_types::{IconType, MapItem, MapMarkerType, MapTextItem, TeamId};
 
     use super::*;
     use mockito::{mock, Mock};
@@ -226,7 +226,7 @@ mod test {
                 "text": "Cavitatis",
                 "x": 0.43523252,
                 "y": 0.6119927,
-                "mapMarkerType": "Minor"
+                "mapMarkerType": "Major"
               }
             ],
             "lastUpdated": 1635388391413,
@@ -238,13 +238,13 @@ mod test {
                 text: "Captain's Dread".to_string(),
                 x: 0.8643478,
                 y: 0.4387644,
-                map_marker_type: "Minor".to_string(),
+                map_marker_type: MapMarkerType::Minor,
             },
             MapTextItem {
                 text: "Cavitatis".to_string(),
                 x: 0.43523252,
                 y: 0.6119927,
-                map_marker_type: "Minor".to_string(),
+                map_marker_type: MapMarkerType::Major,
             },
         ];
 

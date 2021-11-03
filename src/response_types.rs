@@ -67,7 +67,7 @@ pub struct MapTextItem {
     pub text: String,
     pub x: f32,
     pub y: f32,
-    pub map_marker_type: String,
+    pub map_marker_type: MapMarkerType,
 }
 
 /// The type of icon for a map item.
@@ -131,4 +131,11 @@ pub enum TeamId {
     None,
     Wardens,
     Colonials,
+}
+
+/// Indicates whether or not a map marker is major or minor.
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+pub enum MapMarkerType {
+    Major,
+    Minor,
 }
