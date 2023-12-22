@@ -25,7 +25,7 @@ pub mod response_types;
 use thiserror::Error;
 
 use reqwest::Error as ReqwestError;
-use response_types::{MapDataResponse, MapNameResponse, WarDataResponse};
+use response_types::{MapDataResponse, MapNameResponse, WarDataResponse, WarReportResponse};
 use serde::de::DeserializeOwned;
 
 const MAP_NAME: &str = "/worldconquest/maps";
@@ -78,6 +78,20 @@ impl Client {
         let map_data = MapNameResponse { maps };
 
         Ok(map_data)
+    }
+
+    /// Retrieves the war report for a given map.
+    ///
+    /// This endpoint retrieves the war report for a given map, and returns it deserialized as
+    /// [`WarReportResponse`].
+    pub async fn map_war_report(
+        &self,
+        map_name: String,
+    ) -> Result<WarReportResponse, FoxholeApiError> {
+        let endpoint_string = format!("/worldconquest/warReport/{}", map_name);
+        let war_report: WarReportResponse = self.get_response(endpoint_string).await?;
+
+        Ok(war_report)
     }
 
     /// Retrieves all static map data.
@@ -343,6 +357,32 @@ mod test {
 
         let client = Client::default();
         let response = client.map_data_dynamic(map_string).await.unwrap();
+        assert_eq!(expected_response, response);
+    }
+
+    #[tokio::test]
+    async fn test_map_war_report() {
+        let war_report_string = r#"{
+            "totalEnlistments" : 1000,
+            "colonialCasualties" : 2000,
+            "wardenCasualties" : 2000,
+            "dayOfWar" : 355
+          }"#;
+
+        let expected_response = WarReportResponse {
+            total_enlistments: 1000,
+            colonial_casualties: 2000,
+            warden_casualties: 2000,
+            day_of_war: 355,
+        };
+
+        let _m = build_mock("/worldconquest/warReport/TheFingersHex", war_report_string);
+
+        let client = Client::default();
+        let response = client
+            .map_war_report("TheFingersHex".to_string())
+            .await
+            .unwrap();
         assert_eq!(expected_response, response);
     }
 }

@@ -22,6 +22,18 @@ pub struct WarDataResponse {
     pub required_victory_towns: u8,
 }
 
+/// Response for the `worldconquest/warReport/{map}` endpoint.
+///
+/// This response contains information about the current state of the war for a given map.
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct WarReportResponse {
+    pub total_enlistments: u32,
+    pub colonial_casualties: u32,
+    pub warden_casualties: u32,
+    pub day_of_war: u32,
+}
+
 /// Response for the `worldconquest/maps` endpoint.
 ///
 /// Contains a list of all maps present on the shard.
