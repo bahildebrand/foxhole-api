@@ -124,6 +124,12 @@ pub enum IconType {
     TownBase3 = 58,
     StormCannon = 59,
     IntelCenter = 60,
+    CoalField = 61,
+    OilField = 62,
+    RocketTarget = 70,
+    RocketGroundZero = 71,
+    RocketSiteWithRocket = 72,
+    FacilityMineOilRig = 75,
 }
 
 /// Team id for a map item.
