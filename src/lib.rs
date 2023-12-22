@@ -15,8 +15,8 @@
 //!
 //!     let war_data = client.war_data().await.unwrap();
 //!     let map_names = client.map_names().await.unwrap();
-//!     let static_map_data = client.map_data_static("TheFingersHex".to_string()).await.unwrap();
-//!     let dynamic_map_data = client.map_data_dynamic("TheFingersHex".to_string()).await.unwrap();
+//!     let static_map_data = client.map_data_static("TheFingersHex").await.unwrap();
+//!     let dynamic_map_data = client.map_data_dynamic("TheFingersHex").await.unwrap();
 //! }
 //! ```
 
@@ -86,7 +86,7 @@ impl Client {
     /// [`WarReportResponse`].
     pub async fn map_war_report(
         &self,
-        map_name: String,
+        map_name: &str,
     ) -> Result<WarReportResponse, FoxholeApiError> {
         let endpoint_string = format!("/worldconquest/warReport/{}", map_name);
         let war_report: WarReportResponse = self.get_response(endpoint_string).await?;
@@ -100,7 +100,7 @@ impl Client {
     /// includes map text labels and resource node locations.
     pub async fn map_data_static(
         &self,
-        map_name: String,
+        map_name: &str,
     ) -> Result<MapDataResponse, FoxholeApiError> {
         // FIXME: Write a macro for this to avoid copy pasta
         let endpoint_string = format!("/worldconquest/maps/{}/static", map_name);
@@ -116,7 +116,7 @@ impl Client {
     /// player built fortifications, is not available.
     pub async fn map_data_dynamic(
         &self,
-        map_name: String,
+        map_name: &str,
     ) -> Result<MapDataResponse, FoxholeApiError> {
         // FIXME: Write a macro for this to avoid copy pasta
         let endpoint_string = format!("/worldconquest/maps/{}/dynamic/public", map_name);
@@ -284,7 +284,7 @@ mod test {
         let _m = build_mock(endpoint_string.as_str(), map_data_string);
 
         let client = Client::default();
-        let response = client.map_data_static(map_string).await.unwrap();
+        let response = client.map_data_static(&map_string).await.unwrap();
         assert_eq!(expected_response, response);
     }
 
@@ -356,7 +356,7 @@ mod test {
         let _m = build_mock(endpoint_string.as_str(), map_data_string);
 
         let client = Client::default();
-        let response = client.map_data_dynamic(map_string).await.unwrap();
+        let response = client.map_data_dynamic(&map_string).await.unwrap();
         assert_eq!(expected_response, response);
     }
 
@@ -379,10 +379,7 @@ mod test {
         let _m = build_mock("/worldconquest/warReport/TheFingersHex", war_report_string);
 
         let client = Client::default();
-        let response = client
-            .map_war_report("TheFingersHex".to_string())
-            .await
-            .unwrap();
+        let response = client.map_war_report("TheFingersHex").await.unwrap();
         assert_eq!(expected_response, response);
     }
 }
