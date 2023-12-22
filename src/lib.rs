@@ -22,13 +22,20 @@
 
 pub mod response_types;
 
-use std::error::Error;
+use thiserror::Error;
 
+use reqwest::Error as ReqwestError;
 use response_types::{MapDataResponse, MapNameResponse, WarDataResponse};
 use serde::de::DeserializeOwned;
 
 const MAP_NAME: &str = "/worldconquest/maps";
 const WAR_DATA: &str = "/worldconquest/war";
+
+#[derive(Error, Debug)]
+pub enum FoxholeApiError {
+    #[error("Error fetching data from the war API")]
+    FetchError(#[from] ReqwestError),
+}
 
 /// Used to specify the shard of the api
 pub enum Shard {
@@ -56,7 +63,7 @@ impl Client {
     ///
     /// This endpoint retrieves information about the current war, and returns it deserialized as
     /// [`WarDataResponse`].
-    pub async fn war_data(&self) -> Result<WarDataResponse, Box<dyn Error>> {
+    pub async fn war_data(&self) -> Result<WarDataResponse, FoxholeApiError> {
         let war_data: WarDataResponse = self.get_response(WAR_DATA.to_string()).await?;
 
         Ok(war_data)
@@ -66,7 +73,7 @@ impl Client {
     ///
     /// This endpoint retrieves all map names currently present, and returns them deserialized as
     /// [`MapNameResponse`].
-    pub async fn map_names(&self) -> Result<MapNameResponse, Box<dyn Error>> {
+    pub async fn map_names(&self) -> Result<MapNameResponse, FoxholeApiError> {
         let maps: Vec<String> = self.get_response(MAP_NAME.to_string()).await?;
         let map_data = MapNameResponse { maps };
 
@@ -80,7 +87,7 @@ impl Client {
     pub async fn map_data_static(
         &self,
         map_name: String,
-    ) -> Result<MapDataResponse, Box<dyn Error>> {
+    ) -> Result<MapDataResponse, FoxholeApiError> {
         // FIXME: Write a macro for this to avoid copy pasta
         let endpoint_string = format!("/worldconquest/maps/{}/static", map_name);
         let map_data: MapDataResponse = self.get_response(endpoint_string).await?;
@@ -96,7 +103,7 @@ impl Client {
     pub async fn map_data_dynamic(
         &self,
         map_name: String,
-    ) -> Result<MapDataResponse, Box<dyn Error>> {
+    ) -> Result<MapDataResponse, FoxholeApiError> {
         // FIXME: Write a macro for this to avoid copy pasta
         let endpoint_string = format!("/worldconquest/maps/{}/dynamic/public", map_name);
         let map_data: MapDataResponse = self.get_response(endpoint_string).await?;
@@ -104,7 +111,7 @@ impl Client {
         Ok(map_data)
     }
 
-    async fn get_response<T>(&self, endpoint: String) -> Result<T, Box<dyn Error>>
+    async fn get_response<T>(&self, endpoint: String) -> Result<T, FoxholeApiError>
     where
         T: DeserializeOwned,
     {
